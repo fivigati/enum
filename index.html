@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAHIRA - Platform Numerasi SMPN 28 Malang</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Google: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* Animasi Getar Saat Salah */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+    <!-- Ornamen Lingkaran Latar Belakang -->
+    <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: HALAMAN LOGIN                      -->
+    <!-- ========================================== -->
+    <div id="view-login" class="flex-1 flex flex-col justify-between min-h-screen relative z-10">
+        <header class="w-full py-5 lg:py-6 px-6 lg:px-12 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center space-x-3">
+                <span class="bg-gradient-to-r from-amber-400 to-amber-300 text-indigo-950 font-extrabold px-3 py-1 rounded-lg text-xl shadow-lg shadow-amber-400/20">GNN</span>
+                <span class="font-bold text-xl md:text-2xl tracking-wide text-white">MAHIRA</span>
+            </div>
+        </header>
+
+        <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div class="space-y-6 text-center lg:text-left order-2 lg:order-1">
+                <div class="space-y-4">
+                    <div class="flex justify-center lg:justify-start">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-lg">
+                            <img src="assets/img/logo-smpn28.png" alt="Logo SMPN 28 Malang" class="w-20 h-20 object-contain" onerror="this.src='https://via.placeholder.com/80?text=S28'">
+                        </div>
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white">
+                        Mahir Numerasi, <br />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">
+                            Majukan Negeri
+                        </span>
+                    </h1>
+                    <p class="text-blue-200/90 text-sm md:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        Platform penguatan numerasi interaktif yang dirancang untuk membantu murid mengembangkan kemampuan berpikir logis, analitis, dan kreatif melalui aktivitas belajar yang menantang.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap justify-center lg:justify-start gap-2 text-xs font-semibold text-blue-100">
+                    <span class="bg-blue-800/40 px-3 py-1.5 rounded-full border border-blue-600/30">🧠 Berpikir Kritis</span>
+                    <span class="bg-blue-800/40 px-3 py-1.5 rounded-full border border-blue-600/30">💡 Bernalar Logis</span>
+                    <span class="bg-blue-800/40 px-3 py-1.5 rounded-full border border-blue-600/30">🎮 Belajar Interaktif</span>
+                </div>
+            </div>
+
+            <div class="w-full max-w-md mx-auto order-1 lg:order-2">
+                <div class="bg-white/10 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/20 shadow-2xl space-y-6">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl font-bold text-white">Mulai Pembelajaran</h2>
+                        <p class="text-xs text-blue-200">Pilih kelas dan namamu untuk memulai.</p>
+                    </div>
+
+                    <form id="loginForm" autocomplete="off" class="space-y-4">
+                        <div class="space-y-1 text-left">
+                            <label for="kelas" class="block text-xs font-medium text-blue-200">Pilih Kelas</label>
+                            <select id="kelas" required class="w-full bg-slate-900/80 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm">
+                                <option value="" selected disabled>Memuat daftar kelas...</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1 text-left">
+                            <label for="murid" class="block text-xs font-medium text-blue-200">Pilih Nama</label>
+                            <select id="murid" required disabled class="w-full bg-slate-900/80 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm disabled:opacity-50">
+                                <option value="" selected>Pilih kelas terlebih dahulu</option>
+                            </select>
+                        </div>
+
+                        <button id="btnLogin" type="submit" disabled class="w-full mt-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-indigo-950 font-extrabold py-3.5 rounded-xl transition-all shadow-lg text-sm tracking-wider uppercase disabled:opacity-50">
+                            Masuk
+                        </button>
+                    </form>
+
+                    <div class="text-center border-t border-white/10 pt-4">
+                        <p class="text-[11px] text-blue-300/80 italic">"Mahir numerasi melalui pembelajaran yang menyenangkan."</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="w-full text-center py-4 text-xs text-blue-300/60">
+            &copy; 2026 SMP Negeri 28 Malang • MAHIRA v1.0
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: DASHBOARD UTAMA                    -->
+    <!-- ========================================== -->
+    <div id="view-dashboard" class="hidden min-h-screen flex flex-col justify-between relative z-10">
+        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+            <div class="flex items-center space-x-3">
+                <span class="bg-amber-400 text-slate-950 font-extrabold px-3 py-1 rounded-lg text-lg">GNN</span>
+                <span class="font-bold text-xl tracking-wide">MAHIRA</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <p id="user-display-name" class="font-bold text-sm text-amber-300">Nama Siswa</p>
+                    <p id="user-display-class" class="text-xs text-slate-400">Kelas</p>
+                </div>
+                <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs px-3 py-2 rounded-xl text-slate-300 transition-all">
+                    Keluar
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-6 py-8 space-y-8 flex-1 w-full">
+            <section class="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-slate-900 border border-blue-500/20 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-2xl">
+                <div class="max-w-3xl space-y-3">
+                    <span class="bg-blue-500/20 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full border border-blue-400/30 uppercase tracking-wider">
+                        Gerakan Numerasi Nasional
+                    </span>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-white">Apa itu Numerasi? 🤔</h1>
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                        Numerasi bukan sekadar menghafal rumus. Numerasi adalah <strong class="text-amber-300">kemampuan bernalar menggunakan konsep matematika</strong> untuk menyelesaikan masalah nyata dalam kehidupan sehari-hari secara kritis dan analitis.
+                    </p>
+                </div>
+            </section>
+
+            <section id="banner-perkalian" class="bg-gradient-to-r from-amber-500/20 via-amber-600/10 to-slate-900 border-2 border-amber-400/60 p-6 rounded-3xl shadow-xl transition-all">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-2 max-w-xl">
+                        <span id="banner-badge" class="bg-amber-400 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">
+                            ⚡ Syarat Akses Modul
+                        </span>
+                        <h3 id="banner-title" class="text-xl font-extrabold text-white">Selesaikan Tantangan Perkalian Dasar!</h3>
+                        <p id="banner-desc" class="text-xs text-amber-200/80 leading-relaxed">
+                            Selesaikan tantangan perkalian cepat 2 s.d 9 untuk membuka kunci seluruh domain numerasi di bawah ini.
+                        </p>
+                    </div>
+                    <button id="banner-btn" onclick="bukaViewQuiz()" class="w-full md:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3.5 rounded-2xl shadow-lg transition-all hover:scale-105 text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                        <span>⚡</span> Mulai Tantangan Perkalian
+                    </button>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span>📚</span> Pilih Domain Numerasi
+                    </h2>
+                    <span id="status-akses" class="text-xs font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-full">
+                        🔒 Terkunci (Selesaikan Perkalian)
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div id="card-bilangan" onclick="clickDomain('bilangan')" class="cursor-not-allowed opacity-60 bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all shadow-xl">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-3xl">🔢</span>
+                            <span class="status-badge text-[10px] bg-slate-800 text-slate-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Bilangan</h3>
+                        <p class="text-xs text-slate-400 mt-1">Bilangan bulat, pecahan, rasio, hingga bentuk akar.</p>
+                        <span class="sub-count inline-block mt-3 text-[11px] font-semibold text-slate-500">Selesaikan Perkalian 🔒</span>
+                    </div>
+
+                    <div id="card-aljabar" onclick="clickDomain('aljabar')" class="cursor-not-allowed opacity-60 bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all shadow-xl">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-3xl">📐</span>
+                            <span class="status-badge text-[10px] bg-slate-800 text-slate-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Aljabar</h3>
+                        <p class="text-xs text-slate-400 mt-1">PLSV, PtLSV, pola bilangan, hingga SPLDV.</p>
+                        <span class="sub-count inline-block mt-3 text-[11px] font-semibold text-slate-500">Selesaikan Perkalian 🔒</span>
+                    </div>
+
+                    <div id="card-geometri" onclick="clickDomain('geometri')" class="cursor-not-allowed opacity-60 bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all shadow-xl">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-3xl">📏</span>
+                            <span class="status-badge text-[10px] bg-slate-800 text-slate-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Pengukuran & Geometri</h3>
+                        <p class="text-xs text-slate-400 mt-1">Bangun datar, ruang, phytagoras, dan transformasi.</p>
+                        <span class="sub-count inline-block mt-3 text-[11px] font-semibold text-slate-500">Selesaikan Perkalian 🔒</span>
+                    </div>
+
+                    <div id="card-statistika" onclick="clickDomain('statistika')" class="cursor-not-allowed opacity-60 bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all shadow-xl">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-3xl">📊</span>
+                            <span class="status-badge text-[10px] bg-slate-800 text-slate-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Statistika & Peluang</h3>
+                        <p class="text-xs text-slate-400 mt-1">Penyajian data, analisis pemusatan, dan peluang.</p>
+                        <span class="sub-count inline-block mt-3 text-[11px] font-semibold text-slate-500">Selesaikan Perkalian 🔒</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center py-4 text-xs text-slate-500">
+            Gerakan Numerasi Nasional &bull; SMPN 28 Malang
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: TANTANGAN PERKALIAN (QUIZ)         -->
+    <!-- ========================================== -->
+    <div id="view-quiz" class="hidden min-h-screen flex flex-col justify-between relative z-10">
+        <header class="bg-slate-900/90 border-b border-slate-800 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+            <button onclick="bukaViewDashboard()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-700 transition-all">
+                <span>🏠</span> Home
+            </button>
+            <div class="flex items-center gap-2">
+                <span class="bg-amber-400 text-slate-950 font-extrabold px-2 py-0.5 rounded text-xs">GNN</span>
+                <span class="font-extrabold text-sm md:text-base tracking-wide">MAHIRA</span>
+            </div>
+            <div class="bg-slate-800 border border-amber-400/30 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                <span class="text-xs text-slate-400">⏱️</span>
+                <span id="level-timer" class="font-mono font-bold text-amber-300 text-sm">00:00</span>
+            </div>
+        </header>
+
+        <main class="max-w-xl w-full mx-auto px-4 py-6 flex-1 flex flex-col justify-center">
+            <div id="game-card" class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span id="level-badge" class="font-extrabold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-full uppercase">
+                            LEVEL: PERKALIAN 2
+                        </span>
+                        <span id="soal-progress" class="text-slate-400 font-semibold">Soal 1 dari 9</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-amber-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <div id="feedback-msg" class="hidden text-center text-xs md:text-sm font-semibold p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 animate-shake">
+                    ⚠️ Ada yang kurang tepat! Hitung kembali Perkalian <span id="wrong-level-text"></span> dari awal.
+                </div>
+
+                <div class="text-center py-6 space-y-4">
+                    <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">Berapakah hasil dari:</div>
+                    <div id="soal-text" class="text-5xl md:text-6xl font-black text-white tracking-tight">
+                        2 × 4
+                    </div>
+                </div>
+
+                <form onsubmit="jawabSoal(event)" class="space-y-4">
+                    <div class="relative max-w-xs mx-auto">
+                        <input type="number" id="jawaban-input" placeholder="Ketik jawaban..." autofocus autocomplete="off" required
+                            class="w-full bg-slate-950 border-2 border-slate-700 focus:border-amber-400 text-center text-2xl font-bold py-3.5 rounded-2xl text-amber-300 focus:outline-none transition-all shadow-inner">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-black py-4 rounded-2xl shadow-lg shadow-amber-400/20 text-sm uppercase tracking-wider transition-all hover:scale-[1.02]">
+                        Jawab (Tekan Enter ↵)
+                    </button>
+                </form>
+            </div>
+
+            <div id="rekap-card" class="hidden bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-6 shadow-2xl">
+                <div class="text-center space-y-2">
+                    <div class="text-5xl">🏆</div>
+                    <h2 class="text-2xl font-extrabold text-white">Tantangan Selesai!</h2>
+                    <p class="text-xs text-slate-400">Rapor Diagnostik Kecepatan Perkalianmu:</p>
+                </div>
+
+                <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <div class="grid grid-cols-3 text-[11px] font-bold text-slate-400 border-b border-slate-800 pb-2 px-2">
+                        <span>LEVEL</span>
+                        <span class="text-center">WAKTU</span>
+                        <span class="text-right">PREDIKAT</span>
+                    </div>
+                    <div id="rapor-list" class="space-y-1.5"></div>
+                </div>
+
+                <button onclick="bukaViewDashboard()" class="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold py-4 rounded-2xl text-sm uppercase tracking-wider transition-all">
+                    Selesai & Buka Modul ➔
+                </button>
+            </div>
+        </main>
+
+        <footer class="text-center py-4 text-xs text-slate-500">
+            Gerakan Numerasi Nasional &bull; SMPN 28 Malang
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 4: DETAIL DOMAIN NUMERASI             -->
+    <!-- ========================================== -->
+    <div id="view-domain-detail" class="hidden min-h-screen flex flex-col justify-between relative z-10">
+        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+            <button onclick="showDashboard()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition-all">
+                <span>⬅️</span> Kembali ke Dashboard
+            </button>
+            <span class="font-bold text-amber-300 text-sm" id="domain-header-title">Domain Bilangan</span>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-6 py-8 space-y-6 flex-1 w-full">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-widest" id="domain-detail-subtitle">Modul Pembelajaran</span>
+                <h2 class="text-3xl font-extrabold text-white" id="domain-detail-title">Detail Sub-Materi</h2>
+            </div>
+
+            <!-- Grid Cards Sub-Materi -->
+            <div id="grid-sub-materi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </main>
+
+        <footer class="text-center py-4 text-xs text-slate-500">
+            Gerakan Numerasi Nasional &bull; SMPN 28 Malang
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 5: MODUL / SOAL SUB-MATERI            -->
+    <!-- ========================================== -->
+    <div id="view-materi-active" class="hidden min-h-screen flex flex-col justify-between relative z-10">
+        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+            <button onclick="showView('view-domain-detail')" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition-all">
+                <span>⬅️</span> Kembali
+            </button>
+            <span class="font-bold text-amber-300 text-sm" id="active-materi-title">Bilangan Bulat</span>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 py-12 text-center space-y-6 flex-1 w-full flex flex-col justify-center items-center">
+            <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-4 max-w-xl w-full shadow-2xl">
+                <span class="text-5xl" id="active-materi-icon">🔢</span>
+                <h2 class="text-2xl font-extrabold text-white" id="active-materi-heading">Modul Bilangan Bulat</h2>
+                <p class="text-xs text-slate-400 leading-relaxed" id="active-materi-desc">
+                    Halaman modul pembelajaran dan latihan soal untuk sub-materi ini siap dikembangkan.
+                </p>
+                <button onclick="alert('Fitur latihan soal untuk sub-materi ini siap diisi!')" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all">
+                    Mulai Pembelajaran ➔
+                </button>
+            </div>
+        </main>
+
+        <footer class="text-center py-4 text-xs text-slate-500">
+            Gerakan Numerasi Nasional &bull; SMPN 28 Malang
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- LOGIKA JAVASCRIPT SYSTEM                   -->
+    <!-- ========================================== -->
+    <script>
+        // 1. SUPABASE CONFIG
+        const SUPABASE_URL = "https://vpsxtemrynbisqekbgpf.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_n_Q6JTlnckCI6vlAPu2L7A_27nkhJnB";
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // State Global Siswa
+        let activeStudent = null; // { studentId, studentName, className }
+        let isUnlocked = false;
+
+        // State Quiz Perkalian
+        let currentLevel = 2;
+        const maxLevel = 9;
+        let soalQueue = [];
+        let currentSoalIndex = 0;
+        let levelDetik = 0;
+        let levelTimerInterval = null;
+        let currentAttempts = 1;
+        let raporHasil = [];
+
+        // Curriculum Data
+        const materiData = {
+            bilangan: {
+                title: "Domain Bilangan", subtitle: "Modul Pembelajaran Bilangan",
+                subMateri: [
+                    { nama: "Bilangan Bulat", detail: "Representasi, Membandingkan, & Operasi Bilangan Bulat", ikon: "🔢", level: "Dasar" },
+                    { nama: "Faktorisasi Prima (KPK & FPB)", detail: "Kelipatan Persekutuan & Faktor Persekutuan Terbesar", ikon: "🧮", level: "Dasar" },
+                    { nama: "Bilangan Rasional", detail: "Konsep Pecahan, Desimal, dan Persen", ikon: "🍕", level: "Menengah" },
+                    { nama: "Operasi Campuran Bilangan", detail: "Aturan Urutan Operasi (Hitung Campuran)", ikon: "⚡", level: "Menengah" },
+                    { nama: "Aritmetika Sosial", detail: "Untung, Rugi, Diskon, Bunga, & Pajak", ikon: "💰", level: "Penerapan" },
+                    { nama: "Rasio dan Perbandingan", detail: "Perbandingan Senilai & Berbalik Nilai", ikon: "⚖️", level: "Penerapan" },
+                    { nama: "Bilangan Berpangkat", detail: "Konsep & Sifat Pangkat Bulat", ikon: "📈", level: "Lanjutan" },
+                    { nama: "Bentuk Akar", detail: "Sederhanakan & Operasi Bentuk Akar", ikon: "🌿", level: "Lanjutan" },
+                    { nama: "Bentuk Baku", detail: "Notasi Ilmiah untuk Angka Sangat Besar/Kecil", ikon: "🔬", level: "Lanjutan" }
+                ]
+            },
+            aljabar: {
+                title: "Domain Aljabar", subtitle: "Modul Pembelajaran Aljabar",
+                subMateri: [
+                    { nama: "Bentuk dan Operasi Aljabar", detail: "Variabel, Koefisien, & Suku Sejenis", ikon: "🧩", level: "Dasar" },
+                    { nama: "PLSV", detail: "Persamaan Linier Satu Variabel", ikon: "🔤", level: "Dasar" },
+                    { nama: "PtLSV", detail: "Pertidaksamaan Linier Satu Variabel", ikon: "⚖️", level: "Menengah" },
+                    { nama: "Pola Bilangan", detail: "Barisan & Deret Aritmetika/Geometri", ikon: "🔢", level: "Menengah" },
+                    { nama: "Relasi dan Fungsi", detail: "Pemetaan, Domain, Kodomain, & Range", ikon: "🔄", level: "Lanjutan" },
+                    { nama: "Gradien & Persamaan Garis", detail: "Kemiringan Garis Lurus (m) & Grafik", ikon: "📉", level: "Lanjutan" },
+                    { nama: "SPLDV", detail: "Sistem Persamaan Linier Dua Variabel", ikon: "✖️", level: "Tantangan" }
+                ]
+            },
+            geometri: {
+                title: "Pengukuran & Geometri", subtitle: "Modul Spasial & Pengukuran",
+                subMateri: [
+                    { nama: "Bangun Datar", detail: "Luas & Keliling Persegi, Segitiga, dll.", ikon: "🔳", level: "Dasar" },
+                    { nama: "Garis dan Sudut", detail: "Hubungan Antar Sudut & Sejajar", ikon: "📐", level: "Dasar" },
+                    { nama: "Teorema Phytagoras", detail: "Hubungan Sisi Segitiga Siku-Siku", ikon: "🔺", level: "Menengah" },
+                    { nama: "Lingkaran", detail: "Luas, Keliling, Busur, & Juring", ikon: "⭕", level: "Menengah" },
+                    { nama: "Bangun Ruang Sisi Datar", detail: "Kubus, Balok, Prisma, & Limas", ikon: "📦", level: "Menengah" },
+                    { nama: "Bangun Ruang Sisi Lengkung", detail: "Tabung, Kerucut, & Bola", ikon: "🛢️", level: "Lanjutan" },
+                    { nama: "Transformasi Geometri", detail: "Translasi, Refleksi, Rotasi, & Dilatasi", ikon: "🔄", level: "Lanjutan" },
+                    { nama: "Kekongruenan & Kesebangunan", detail: "Syarat Bangun Sama & Sebangun", ikon: "👥", level: "Lanjutan" }
+                ]
+            },
+            statistika: {
+                title: "Statistika & Peluang", subtitle: "Analisis Data & Kepastian",
+                subMateri: [
+                    { nama: "Penyajian Data", detail: "Tabel, Diagram Batang, Garis, & Lingkaran", ikon: "📊", level: "Dasar" },
+                    { nama: "Ukuran Pemusatan Data", detail: "Mean (Rata-rata), Median, & Modus", ikon: "🎯", level: "Menengah" },
+                    { nama: "Ukuran Penyebaran Data", detail: "Jangkauan, Kuartil, & Simpangan", ikon: "📉", level: "Menengah" },
+                    { nama: "Peluang Empiris & Teoretis", detail: "Kemungkinan Kejadian & Ruang Sampel", ikon: "🎲", level: "Lanjutan" }
+                ]
+            }
+        };
+
+        // DOM Elements Login
+        const kelasSelect = document.getElementById("kelas");
+        const muridSelect = document.getElementById("murid");
+        const btnLogin = document.getElementById("btnLogin");
+        const loginForm = document.getElementById("loginForm");
+
+        // ON LOAD INITIALIZATION
+        document.addEventListener("DOMContentLoaded", async () => {
+            const savedStudent = localStorage.getItem("numera_student");
+            if (savedStudent) {
+                activeStudent = JSON.parse(savedStudent);
+                await showDashboard();
+            } else {
+                initLoginPage();
+            }
+        });
+
+        // ------------------------------------------------------
+        // LOGIN PAGE LOGIC
+        // ------------------------------------------------------
+        async function initLoginPage() {
+            showView('view-login');
+            const classes = await getClasses();
+            kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            classes.forEach(c => {
+                kelasSelect.innerHTML += `<option value="${c.class_name}">${c.class_name}</option>`;
+            });
+        }
+
+        async function getClasses() {
+            const { data, error } = await sb.from("v_classes").select("*").order("class_name");
+            return error ? [] : data;
+        }
+
+        async function getStudentsByClass(className) {
+            const { data, error } = await sb.from("v_students").select("*").eq("class_name", className).order("student_name");
+            return error ? [] : data;
+        }
+
+        kelasSelect.addEventListener("change", async () => {
+            muridSelect.disabled = true;
+            muridSelect.innerHTML = '<option>Memuat...</option>';
+            btnLogin.disabled = true;
+
+            const students = await getStudentsByClass(kelasSelect.value);
+            muridSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+            students.forEach(s => {
+                muridSelect.innerHTML += `<option value="${s.id}">${s.student_name}</option>`;
+            });
+            muridSelect.disabled = false;
+        });
+
+        muridSelect.addEventListener("change", () => {
+            btnLogin.disabled = muridSelect.value === "";
+        });
+
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            activeStudent = {
+                className: kelasSelect.value,
+                studentId: muridSelect.value,
+                studentName: muridSelect.options[muridSelect.selectedIndex].text
+            };
+            localStorage.setItem("numera_student", JSON.stringify(activeStudent));
+            showDashboard();
+        });
+
+        function logout() {
+            localStorage.removeItem("numera_student");
+            activeStudent = null;
+            location.reload();
+        }
+
+        // ------------------------------------------------------
+        // DASHBOARD LOGIC
+        // ------------------------------------------------------
+        async function showDashboard() {
+            showView('view-dashboard');
+            document.getElementById("user-display-name").innerText = activeStudent.studentName;
+            document.getElementById("user-display-class").innerText = `Kelas ${activeStudent.className}`;
+            
+            await checkStudentProgress();
+        }
+
+        async function checkStudentProgress() {
+            raporHasil = [];
+            currentLevel = 2;
+
+            try {
+                const numericStudentId = parseInt(activeStudent.studentId, 10);
+
+                const { data, error } = await sb.from('multiplication_progress')
+                    .select('*')
+                    .eq('student_id', numericStudentId)
+                    .maybeSingle();
+
+                if (data) {
+                    let totalSelesai = 0;
+                    let lastCompletedLevel = 1;
+                    let foundUncompleted = false;
+
+                    for (let lvl = 2; lvl <= maxLevel; lvl++) {
+                        if (data[`mul${lvl}_time`]) {
+                            totalSelesai++;
+                            lastCompletedLevel = lvl;
+                            raporHasil.push({
+                                level: `Perkalian ${lvl}`,
+                                detik: data[`mul${lvl}_time`],
+                                predikat: data[`mul${lvl}_predicate`]
+                            });
+                        } else {
+                            if (!foundUncompleted) {
+                                currentLevel = lvl;
+                                foundUncompleted = true;
+                            }
+                        }
+                    }
+
+                    if (totalSelesai === (maxLevel - 2 + 1)) {
+                        unlockDomainsUI();
+                    } else if (totalSelesai > 0) {
+                        updatePartialProgressUI(lastCompletedLevel);
+                    }
+                }
+            } catch (err) {
+                console.log("Belum ada data progres awal.");
+            }
+        }
+
+        function unlockDomainsUI() {
+            isUnlocked = true;
+            
+            const statusAkses = document.getElementById('status-akses');
+            statusAkses.className = "text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full";
+            statusAkses.innerText = "🟢 Semua Domain Terbuka";
+
+            const banner = document.getElementById('banner-perkalian');
+            banner.className = "bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-900 border-2 border-emerald-500/60 p-6 rounded-3xl shadow-xl transition-all";
+            
+            document.getElementById('banner-badge').className = "bg-emerald-400 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider";
+            document.getElementById('banner-badge').innerText = "🏆 SYARAT TERFULFILL";
+            
+            document.getElementById('banner-title').innerText = "Tantangan Perkalian Selesai! 🎉";
+            document.getElementById('banner-desc').innerText = "Selamat! Kamu telah menuntaskan seluruh tantangan perkalian 2 s.d 9. Semua modul numerasi kini terbuka penuh.";
+            
+            const btn = document.getElementById('banner-btn');
+            btn.className = "w-full md:w-auto bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold px-6 py-3.5 rounded-2xl shadow-lg transition-all hover:scale-105 text-xs uppercase tracking-wider flex items-center justify-center gap-2";
+            btn.innerHTML = "<span>⚡</span> Tingkatkan Performa Perkalian";
+
+            ['bilangan', 'aljabar', 'geometri', 'statistika'].forEach(key => {
+                const card = document.getElementById(`card-${key}`);
+                card.className = "cursor-pointer group bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-400/80 p-5 rounded-2xl transition-all shadow-xl hover:-translate-y-1";
+                card.querySelector('.status-badge').className = "status-badge text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full";
+                card.querySelector('.status-badge').innerText = "🟢 Terbuka";
+                card.querySelector('.sub-count').innerText = "Klik untuk Buka ➔";
+            });
+        }
+
+        function updatePartialProgressUI(lastLevel) {
+            const banner = document.getElementById('banner-perkalian');
+            banner.className = "bg-gradient-to-r from-amber-500/20 via-amber-600/10 to-slate-900 border-2 border-amber-400/60 p-6 rounded-3xl shadow-xl transition-all";
+
+            document.getElementById('banner-badge').className = "bg-amber-400 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider";
+            document.getElementById('banner-badge').innerText = "⚡ PROGRES BERJALAN";
+
+            document.getElementById('banner-title').innerText = `Progres: Selesai Hingga Perkalian ${lastLevel}`;
+            document.getElementById('banner-desc').innerText = `Kamu telah menuntaskan Perkalian ${lastLevel}. Lanjutkan ke Perkalian ${lastLevel + 1} untuk membuka akses modul numerasi!`;
+            
+            const btn = document.getElementById('banner-btn');
+            btn.className = "w-full md:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3.5 rounded-2xl shadow-lg transition-all hover:scale-105 text-xs uppercase tracking-wider flex items-center justify-center gap-2";
+            btn.innerHTML = `<span>⚡</span> Lanjutkan Perkalian ${lastLevel + 1}`;
+        }
+
+        function clickDomain(key) {
+            if (!isUnlocked) {
+                alert("⚠️ Selesaikan Tantangan Perkalian terlebih dahulu untuk membuka domain ini!");
+                return;
+            }
+            openDomainPanel(key);
+        }
+
+        // BUKA VIEW 4: DETAIL DOMAIN
+        function openDomainPanel(key) {
+            const data = materiData[key];
+            if (!data) return;
+
+            document.getElementById('domain-header-title').innerText = data.title;
+            document.getElementById('domain-detail-title').innerText = data.title;
+            document.getElementById('domain-detail-subtitle').innerText = data.subtitle;
+
+            const container = document.getElementById('grid-sub-materi');
+            container.innerHTML = '';
+
+            data.subMateri.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 hover:border-amber-400/50 p-5 rounded-2xl flex flex-col justify-between hover:bg-slate-800/40 transition-all group">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-3xl">${item.ikon}</span>
+                                <span class="text-[10px] font-semibold bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">${item.level}</span>
+                            </div>
+                            <h4 class="font-bold text-white text-base group-hover:text-amber-300 transition-colors">${item.nama}</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">${item.detail}</p>
+                        </div>
+                        <button onclick="bukaSubMateriActive('${item.nama}', '${item.detail}', '${item.ikon}')" class="mt-5 w-full bg-slate-950 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-3 rounded-xl border border-slate-700 transition-all">
+                            Mulai Belajar ➔
+                        </button>
+                    </div>
+                `;
+            });
+
+            showView('view-domain-detail');
+        }
+
+        // BUKA VIEW 5: HALAMAN AKTIF SUB-MATERI
+        function bukaSubMateriActive(nama, detail, ikon) {
+            document.getElementById('active-materi-title').innerText = nama;
+            document.getElementById('active-materi-heading').innerText = nama;
+            document.getElementById('active-materi-desc').innerText = detail;
+            document.getElementById('active-materi-icon').innerText = ikon;
+            
+            showView('view-materi-active');
+        }
+
+        // ------------------------------------------------------
+        // QUIZ PERKALIAN LOGIC
+        // ------------------------------------------------------
+        function bukaViewQuiz() {
+            showView('view-quiz');
+            document.getElementById('game-card').classList.remove('hidden');
+            document.getElementById('rekap-card').classList.add('hidden');
+            
+            if (currentLevel > maxLevel) currentLevel = 2;
+            mulaiLevel(currentLevel);
+        }
+
+        function bukaViewDashboard() {
+            clearInterval(levelTimerInterval);
+            showDashboard();
+        }
+
+        function mulaiLevel(level) {
+            currentLevel = level;
+            currentSoalIndex = 0;
+            levelDetik = 0;
+            
+            let pengaliList = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+            soalQueue = shuffleArray(pengaliList);
+
+            document.getElementById('level-badge').innerText = `LEVEL: PERKALIAN ${currentLevel}`;
+            tampilkanSoalCurrent();
+
+            clearInterval(levelTimerInterval);
+            levelTimerInterval = setInterval(() => {
+                levelDetik++;
+                const mins = Math.floor(levelDetik / 60).toString().padStart(2, '0');
+                const secs = (levelDetik % 60).toString().padStart(2, '0');
+                document.getElementById('level-timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function tampilkanSoalCurrent() {
+            const pengali = soalQueue[currentSoalIndex];
+            document.getElementById('soal-text').innerText = `${currentLevel} × ${pengali}`;
+            document.getElementById('soal-progress').innerText = `Soal ${currentSoalIndex + 1} dari ${soalQueue.length}`;
+            
+            const percent = ((currentSoalIndex) / soalQueue.length) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            const input = document.getElementById('jawaban-input');
+            input.value = '';
+            input.focus();
+        }
+
+        async function jawabSoal(e) {
+            e.preventDefault();
+            const input = document.getElementById('jawaban-input');
+            const jawabanSiswa = parseInt(input.value, 10);
+            const pengaliCurrent = soalQueue[currentSoalIndex];
+            const kunciJawaban = currentLevel * pengaliCurrent;
+
+            if (jawabanSiswa === kunciJawaban) {
+                hideFeedback();
+                currentSoalIndex++;
+
+                if (currentSoalIndex < soalQueue.length) {
+                    tampilkanSoalCurrent();
+                } else {
+                    await simpanHasilLevel();
+                    if (currentLevel < maxLevel) {
+                        currentLevel++;
+                        mulaiLevel(currentLevel);
+                    } else {
+                        selesaiSemuaLevel();
+                    }
+                }
+            } else {
+                currentAttempts++;
+                showFeedback();
+                mulaiLevel(currentLevel);
+            }
+        }
+
+        async function simpanHasilLevel() {
+            clearInterval(levelTimerInterval);
+            
+            let predikat = "";
+            if (levelDetik <= 20) predikat = "⭐⭐⭐ Excellent";
+            else if (levelDetik <= 27) predikat = "⭐⭐ Good";
+            else if (levelDetik <= 40) predikat = "⭐ Fair";
+            else predikat = "🌱 Keep Practicing";
+
+            raporHasil.push({
+                level: `Perkalian ${currentLevel}`,
+                detik: levelDetik,
+                predikat: predikat
+            });
+
+            const timeCol = `mul${currentLevel}_time`;
+            const predCol = `mul${currentLevel}_predicate`;
+            const attCol = `mul${currentLevel}_attempts`;
+
+            const numericStudentId = parseInt(activeStudent.studentId, 10);
+
+            const prevAttempts = await getPrevAttempts(numericStudentId, attCol);
+            const totalAttempts = prevAttempts + currentAttempts;
+
+            const updatePayload = {
+                student_id: numericStudentId,
+                student_name: activeStudent.studentName,
+                [timeCol]: levelDetik,
+                [predCol]: predikat,
+                [attCol]: totalAttempts,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const { data, error } = await sb
+                    .from('multiplication_progress')
+                    .upsert(updatePayload, { onConflict: 'student_id' });
+
+                if (error) {
+                    console.error('❌ Supabase Upsert Error:', error);
+                    alert(`Gagal menyimpan ke Supabase: ${error.message}`);
+                } else {
+                    console.log(`✅ Success Simpan Perkalian ${currentLevel}`);
+                }
+            } catch (err) {
+                console.error('❌ Exception Catch:', err);
+            }
+
+            currentAttempts = 1;
+        }
+
+        async function getPrevAttempts(studentId, attCol) {
+            try {
+                const numericStudentId = parseInt(studentId, 10);
+                const { data, error } = await sb
+                    .from('multiplication_progress')
+                    .select(attCol)
+                    .eq('student_id', numericStudentId)
+                    .maybeSingle();
+
+                if (error) {
+                    console.warn('Warning getPrevAttempts:', error.message);
+                    return 0;
+                }
+
+                return data && data[attCol] ? data[attCol] : 0;
+            } catch {
+                return 0;
+            }
+        }
+
+        function selesaiSemuaLevel() {
+            document.getElementById('game-card').classList.add('hidden');
+            document.getElementById('rekap-card').classList.remove('hidden');
+
+            const container = document.getElementById('rapor-list');
+            container.innerHTML = '';
+
+            raporHasil.forEach(item => {
+                container.innerHTML += `
+                    <div class="grid grid-cols-3 items-center text-xs bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="font-bold text-white">${item.level}</span>
+                        <span class="text-center font-mono text-amber-300">${item.detik} Detik</span>
+                        <span class="text-right font-semibold">${item.predikat}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // ------------------------------------------------------
+        // UTILS & NAVIGATION
+        // ------------------------------------------------------
+        function showView(viewId) {
+            const views = ['view-login', 'view-dashboard', 'view-quiz', 'view-domain-detail', 'view-materi-active'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showFeedback() {
+            const fb = document.getElementById('feedback-msg');
+            document.getElementById('wrong-level-text').innerText = currentLevel;
+            fb.classList.remove('hidden');
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback-msg').classList.add('hidden');
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+    </script>
+</body>
+</html>
